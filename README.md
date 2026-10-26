@@ -40,6 +40,15 @@ uvicorn app.main:app --app-dir src --env-file .env
 
 The key lives only in `.env` (git-ignored) and is sent from the server in a request header.
 
+## Double-click launcher
+
+`start.bat` creates `.venv` on first run, starts the app on a free port and opens the browser.
+Put `.env` next to it for AI substitutions. Needs Python 3.12 on the machine.
+
+A single-file `.exe` can be built with PyInstaller (`pyinstaller --onefile --name StudentBudgetRecipes
+--paths src --add-data "src/app/templates;app/templates" --collect-submodules uvicorn run.py`),
+but Windows Application Control blocks unsigned executables on some machines, so `start.bat` is the reliable route.
+
 ## Test
 
 ```bash

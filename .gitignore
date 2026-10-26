@@ -5,3 +5,6 @@ __pycache__/
 .pytest_cache/
 *.db
 .claude/skills/
+dist/
+build/
+*.spec
