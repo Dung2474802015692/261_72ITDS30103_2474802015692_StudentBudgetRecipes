@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Ví &amp; thực đơn</h1>
+
+<section>
+  <h2>Ví: <span class="ok">{{ wallet.balance|vnd }}</span></h2>
+  <form method="post" action="/wallet/topup">
+    <label>Nạp thêm (đ) <input type="number" name="amount" min="1000" step="1000" required></label>
+    <button>Nạp tiền</button>
+  </form>
+</section>
+
+<section>
+  <h2>Tạo thực đơn mới</h2>
+  <form method="post" action="/plans">
+    <label>Chu kỳ
+      <select name="period">
+        <option value="day">Ngày (1 ngày)</option>
+        <option value="week" selected>Tuần (7 ngày)</option>
+        <option value="month">Tháng (30 ngày)</option>
+      </select>
+    </label>
+    <label>Ngân sách (đ) <input type="number" name="budget" min="1000" step="1000" required></label>
+    <label>Ngày bắt đầu <input type="date" name="start" value="{{ today.isoformat() }}" required></label>
+    <label>Thực phẩm cần tránh (dị ứng, không hợp), cách nhau bằng dấu phẩy
+      <input type="text" name="exclusions" placeholder="tôm, đậu phộng" size="40">
+    </label>
+    <button>Tạo thực đơn</button>
+    <br><small>Ngân sách được trừ từ ví. Mỗi ngày có 2 bữa: trưa và tối.</small>
+  </form>
+</section>
+
+<h2>Các thực đơn</h2>
+{% if rows %}
+<table>
+  <tr><th>Chu kỳ</th><th>Thời gian</th><th>Ngân sách</th><th>Chi phí</th><th></th></tr>
+  {% for plan, cost, end in rows %}
+  <tr>
+    <td>{{ {"day": "Ngày", "week": "Tuần", "month": "Tháng"}[plan.period] }}</td>
+    <td>{{ plan.start_date.strftime("%d/%m/%Y") }} – {{ end.strftime("%d/%m/%Y") }}</td>
+    <td>{{ plan.budget|vnd }}</td>
+    <td class="{{ 'bad' if cost > plan.budget else 'ok' }}">{{ cost|vnd }}</td>
+    <td><a href="/plans/{{ plan.id }}">Xem</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Chưa có thực đơn nào. Nạp tiền vào ví rồi tạo thực đơn đầu tiên.</p>
+{% endif %}
+{% endblock %}

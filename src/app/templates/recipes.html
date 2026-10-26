@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Công thức</h1>
+
+<section>
+  <h2>{{ "Sửa món" if edit else "Thêm món" }}</h2>
+  <form method="post" action="{{ '/recipes/' ~ edit.id if edit else '/recipes' }}">
+    <label>Tên món <input name="name" value="{{ edit.name if edit else '' }}" required></label>
+    <label>Số khẩu phần <input type="number" name="servings" step="0.5" min="0.5" value="{{ edit.servings if edit else 1 }}" required></label>
+    <label>Nguyên liệu, mỗi dòng <code>tên; số lượng</code> (số lượng tính theo đơn vị trong bảng giá, ví dụ 0.2 kg)
+      <textarea name="ingredients" rows="6" cols="50" required>{% if edit %}{% for ri in edit.ingredients %}{{ ri.item.name }}; {{ ri.quantity }}
+{% endfor %}{% endif %}</textarea>
+    </label>
+    <button>{{ "Lưu" if edit else "Thêm món" }}</button>
+    {% if edit %}<a href="/recipes">Huỷ</a>{% endif %}
+  </form>
+</section>
+
+<table>
+  <tr><th>Món</th><th>Nguyên liệu</th><th>Giá/khẩu phần</th><th></th></tr>
+  {% for r in recipes %}
+  <tr>
+    <td>{{ r.name }}</td>
+    <td><small>{% for ri in r.ingredients %}{{ ri.item.name }} {{ ri.quantity }} {{ ri.item.unit }}{{ ", " if not loop.last }}{% endfor %}</small></td>
+    <td>{{ costs(r)|vnd }}</td>
+    <td>
+      <a href="/recipes/{{ r.id }}/edit">Sửa</a>
+      <form class="inline" method="post" action="/recipes/{{ r.id }}/delete"><button class="danger">Xoá</button></form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

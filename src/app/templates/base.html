@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Budget Recipes</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 960px; margin: 0 auto; padding: 0 16px 48px; color: #1f2933; }
+    nav { display: flex; gap: 16px; padding: 12px 0; border-bottom: 2px solid #2f855a; margin-bottom: 16px; }
+    nav a { color: #2f855a; font-weight: 600; text-decoration: none; }
+    h1, h2 { margin: 20px 0 8px; }
+    table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+    th, td { border-bottom: 1px solid #e2e8f0; padding: 6px 8px; text-align: left; vertical-align: top; }
+    section { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+    label { display: block; margin: 6px 0; }
+    input, select, textarea, button { font: inherit; padding: 6px 8px; }
+    button { background: #2f855a; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+    button.secondary { background: #4a5568; }
+    button.danger { background: #c53030; }
+    .error { background: #fed7d7; border: 1px solid #c53030; padding: 8px 12px; border-radius: 6px; }
+    .warn { background: #fefcbf; border: 1px solid #d69e2e; padding: 8px 12px; border-radius: 6px; }
+    .ok { color: #2f855a; font-weight: 600; }
+    .bad { color: #c53030; font-weight: 600; }
+    form.inline { display: inline; }
+    small { color: #4a5568; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Ví &amp; thực đơn</a>
+    <a href="/recipes">Công thức</a>
+    <a href="/prices">Bảng giá</a>
+  </nav>
+  {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+  {% block body %}{% endblock %}
+</body>
+</html>
