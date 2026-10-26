@@ -15,7 +15,7 @@
 <section class="card">
   <h2>Nạp tiền vào ví</h2>
   <form method="post" action="/wallet/topup">
-    <label>Số tiền (đ) <input type="number" name="amount" min="1000" step="1000" inputmode="numeric" required></label>
+    <label>Số tiền (đ) <input type="text" inputmode="numeric" autocomplete="off" data-money name="amount" required></label>
     <button class="secondary">Nạp tiền</button>
   </form>
 </section>
@@ -30,7 +30,7 @@
         <option value="month">Tháng (30 ngày)</option>
       </select>
     </label>
-    <label>Ngân sách (đ) <input type="number" name="budget" min="1000" step="1000" inputmode="numeric" required></label>
+    <label>Ngân sách (đ) <input type="text" inputmode="numeric" autocomplete="off" data-money name="budget" required></label>
     <label>Ngày bắt đầu <input type="date" name="start" value="{{ today.isoformat() }}" required></label>
     <label>Thực phẩm cần tránh (dị ứng, không hợp)
       <input type="text" name="exclusions" placeholder="tôm, đậu phộng" aria-describedby="ex-help">

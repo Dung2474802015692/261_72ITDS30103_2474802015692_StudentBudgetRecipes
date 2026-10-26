@@ -8,7 +8,7 @@
   <form method="post" action="/prices">
     <label>Tên <input name="name" required></label>
     <label>Đơn vị (kg, quả, gói…) <input name="unit" required size="8"></label>
-    <label>Giá mỗi đơn vị (đ) <input type="number" name="price" min="1" required></label>
+    <label>Giá mỗi đơn vị (đ) <input type="text" inputmode="numeric" autocomplete="off" data-money name="price" required></label>
     <label>Nhóm <input name="category"></label>
     <button>Thêm</button>
   </form>
@@ -22,7 +22,7 @@
     <td>{{ item.category }}</td>
     <td>{{ item.name }}</td>
     <td><input form="edit{{ item.id }}" name="unit" value="{{ item.unit }}" size="6" aria-label="Đơn vị {{ item.name }}"></td>
-    <td><input form="edit{{ item.id }}" type="number" name="price" value="{{ item.price }}" min="1" aria-label="Giá {{ item.name }}"></td>
+    <td><input form="edit{{ item.id }}" type="text" inputmode="numeric" autocomplete="off" data-money name="price" value="{{ item.price }}" aria-label="Giá {{ item.name }}"></td>
     <td>
       <form id="edit{{ item.id }}" class="inline" method="post" action="/prices/{{ item.id }}"><button>Lưu</button></form>
       <form class="inline" method="post" action="/prices/{{ item.id }}/delete"><button class="danger">Xoá</button></form>

@@ -26,9 +26,17 @@ import uvicorn  # noqa: E402
 
 from app.main import app  # noqa: E402
 
-with socket.socket() as probe:
-    probe.bind(("127.0.0.1", 0))
-    port = probe.getsockname()[1]  # a free port, so a busy 8000 never blocks startup
+def free_port() -> int:
+    for wanted in (8000, 0):  # a steady address when possible, any free port otherwise
+        with socket.socket() as probe:
+            try:
+                probe.bind(("127.0.0.1", wanted))
+            except OSError:
+                continue
+            return probe.getsockname()[1]
+
+
+port = free_port()
 
 print(f"Student Budget Recipes: http://127.0.0.1:{port}  (close this window to stop)")
 threading.Timer(1.5, webbrowser.open, args=(f"http://127.0.0.1:{port}",)).start()

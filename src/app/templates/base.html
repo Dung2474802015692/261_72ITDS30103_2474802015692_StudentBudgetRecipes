@@ -84,5 +84,15 @@
       {% block body %}{% endblock %}
     </main>
   </div>
+  <script>
+    // Show 1.234.567 while typing; send plain digits to the server.
+    document.querySelectorAll("input[data-money]").forEach(function (el) {
+      var digits = function () { return el.value.replace(/\D/g, ""); };
+      var show = function () { el.value = digits().replace(/\B(?=(\d{3})+(?!\d))/g, "."); };
+      el.addEventListener("input", show);
+      show();
+      el.form.addEventListener("submit", function () { el.value = digits(); });
+    });
+  </script>
 </body>
 </html>
