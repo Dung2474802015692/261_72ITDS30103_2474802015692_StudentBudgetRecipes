@@ -2,32 +2,40 @@
 {% block body %}
 {% set slot_name = {"lunch": "Trưa", "dinner": "Tối"} %}
 <h1>Thực đơn {{ {"day": "ngày", "week": "tuần", "month": "tháng"}[plan.period] }}</h1>
-<p>
-  Ngân sách <strong>{{ plan.budget|vnd }}</strong> · Chi phí
-  <strong class="{{ 'bad' if over else 'ok' }}">{{ cost|vnd }}</strong> · Ví còn {{ wallet.balance|vnd }}
-  {% if plan.exclusions %}<br>Tránh: {{ plan.exclusions }}{% endif %}
-</p>
+
+<div class="grid">
+  <div class="stat"><small>Ngân sách</small><strong>{{ plan.budget|vnd }}</strong></div>
+  <div class="stat"><small>Chi phí</small><strong class="{{ 'bad' if over else 'ok' }}">{{ cost|vnd }}</strong></div>
+  <div class="stat"><small>Ví còn</small><strong>{{ wallet.balance|vnd }}</strong></div>
+</div>
+<div class="meter {{ 'over' if over }}" role="img" aria-label="Đã dùng {{ (cost * 100 // plan.budget) }}% ngân sách"><span style="width: {{ [cost * 100 // plan.budget, 100]|min }}%"></span></div>
+{% if plan.exclusions %}<p class="muted">Đang tránh: {{ plan.exclusions }}</p>{% endif %}
 
 {% if over %}
 <section class="warn">
   <strong>Chi phí vượt ngân sách {{ (cost - plan.budget)|vnd }}</strong> (giá có thể đã tăng). Chọn cách xử lý:
-  <form class="inline" method="post" action="/plans/{{ plan.id }}/cheaper"><button class="secondary">Thay món rẻ hơn</button></form>
-  <form class="inline" method="post" action="/plans/{{ plan.id }}/smaller"><button class="secondary">Giảm khẩu phần</button></form>
-  <br><small>Chỉ áp dụng cho các bữa từ hôm nay trở đi.</small>
+  <p>
+    <form class="inline" method="post" action="/plans/{{ plan.id }}/cheaper"><button class="secondary">Thay món rẻ hơn</button></form>
+    <form class="inline" method="post" action="/plans/{{ plan.id }}/smaller"><button class="secondary">Giảm khẩu phần</button></form>
+  </p>
+  <small>Chỉ áp dụng cho các bữa từ hôm nay trở đi.</small>
 </section>
 {% endif %}
 
 {% if offer %}
 <section class="warn">
   Đã nạp {{ offer|vnd }}. Bạn có muốn nâng cấp thực đơn này không? Các ngày đã qua giữ nguyên, các ngày còn lại được tạo lại.
-  <form class="inline" method="post" action="/plans/{{ plan.id }}/upgrade">
-    <input type="hidden" name="amount" value="{{ offer }}">
-    <button>Nâng cấp thực đơn</button>
-  </form>
-  <a href="/plans/{{ plan.id }}">Không, giữ tiền trong ví</a>
+  <p>
+    <form class="inline" method="post" action="/plans/{{ plan.id }}/upgrade">
+      <input type="hidden" name="amount" value="{{ offer }}">
+      <button>Nâng cấp thực đơn</button>
+    </form>
+    <a href="/plans/{{ plan.id }}">Không, giữ tiền trong ví</a>
+  </p>
 </section>
 {% endif %}
 
+<div class="table-wrap">
 <table>
   <tr><th>Ngày</th><th>Trưa</th><th>Tối</th></tr>
   {% for day, meals in days.items() %}
@@ -36,27 +44,30 @@
     {% for slot in ("lunch", "dinner") %}
     <td>
       {% if meals[slot] %}{{ meals[slot].recipe.name }}
-        <small>× {{ meals[slot].servings }} · {{ (costs(meals[slot].recipe) * meals[slot].servings)|vnd }}</small>
+        <br><small>{{ meals[slot].servings }} khẩu phần · {{ (costs(meals[slot].recipe) * meals[slot].servings)|vnd }}</small>
       {% endif %}
     </td>
     {% endfor %}
   </tr>
   {% endfor %}
 </table>
+</div>
 
-<h2>Danh sách đi chợ</h2>
-<p>
-  {% if weeks > 1 %}
-    {% for w in range(1, weeks + 1) %}<a href="/shopping/{{ plan.id }}?week={{ w }}">Tuần {{ w }}</a> · {% endfor %}
-  {% endif %}
-  <a href="/shopping/{{ plan.id }}">{{ "Cả kỳ" if weeks > 1 else "Xem danh sách" }}</a>
-</p>
+<section class="card">
+  <h2>Danh sách đi chợ</h2>
+  <p>
+    {% if weeks > 1 %}
+      {% for w in range(1, weeks + 1) %}<a href="/shopping/{{ plan.id }}?week={{ w }}">Tuần {{ w }}</a> · {% endfor %}
+    {% endif %}
+    <a href="/shopping/{{ plan.id }}">{{ "Cả kỳ" if weeks > 1 else "Xem danh sách" }}</a>
+  </p>
+</section>
 
-<section>
+<section class="card">
   <h2>Nạp thêm tiền</h2>
   <form method="post" action="/plans/{{ plan.id }}/topup">
-    <label>Số tiền (đ) <input type="number" name="amount" min="1000" step="1000" required></label>
-    <button>Nạp</button>
+    <label>Số tiền (đ) <input type="number" name="amount" min="1000" step="1000" inputmode="numeric" required></label>
+    <button class="secondary">Nạp</button>
   </form>
 </section>
 {% endblock %}

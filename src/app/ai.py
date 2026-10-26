@@ -12,7 +12,7 @@ def suggest_substitutes(name: str, avoid: list[str]) -> list[str]:
     key = os.getenv("GEMINI_API_KEY")
     if not key:
         raise AIError("GEMINI_API_KEY is not set")
-    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    model = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
     prompt = (
         f"Gợi ý tối đa 3 nguyên liệu rẻ, dễ mua ở siêu thị Việt Nam để thay thế '{name}' khi nấu ăn. "
         f"Không dùng: {', '.join(avoid) or 'không có'}. "

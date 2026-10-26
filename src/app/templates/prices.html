@@ -3,7 +3,7 @@
 <h1>Bảng giá siêu thị</h1>
 <p class="warn">Đây là <strong>giá mẫu</strong> nhập tay, không phải giá thật của siêu thị. Sửa giá ở đây, thực đơn sẽ tính lại ngay.</p>
 
-<section>
+<section class="card">
   <h2>Thêm sản phẩm</h2>
   <form method="post" action="/prices">
     <label>Tên <input name="name" required></label>
@@ -14,8 +14,9 @@
   </form>
 </section>
 
+<div class="table-wrap">
 <table>
-  <tr><th>Nhóm</th><th>Sản phẩm</th><th>Đơn vị</th><th>Giá (đ)</th><th></th></tr>
+  <tr><th>Nhóm</th><th>Sản phẩm</th><th>Đơn vị</th><th class="num">Giá (đ)</th><th></th></tr>
   {% for item in items %}
   <tr>
     <td>{{ item.category }}</td>
@@ -29,4 +30,5 @@
   </tr>
   {% endfor %}
 </table>
+</div>
 {% endblock %}
