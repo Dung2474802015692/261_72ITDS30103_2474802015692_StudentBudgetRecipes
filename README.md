@@ -49,6 +49,27 @@ A single-file `.exe` can be built with PyInstaller (`pyinstaller --onefile --nam
 --paths src --add-data "src/app/templates;app/templates" --collect-submodules uvicorn run.py`),
 but Windows Application Control blocks unsigned executables on some machines, so `start.bat` is the reliable route.
 
+## Deploy to Render (free)
+
+Render's disk is wiped on every restart, so the public site must use a hosted Postgres, not SQLite.
+
+1. **Database:** create a free Supabase project and copy its **Session pooler** connection string
+   (Render cannot reach Supabase's IPv6-only direct host).
+2. **Web service:** on Render choose *New → Web Service*, connect this repo and set
+
+   | Setting | Value |
+   |---------|-------|
+   | Runtime | Python 3 (version comes from `.python-version`) |
+   | Build command | `pip install -r requirements.txt` |
+   | Start command | `uvicorn app.main:app --app-dir src --host 0.0.0.0 --port $PORT` |
+   | Instance type | Free |
+
+3. **Environment variables** (Render dashboard, never in the repo): `DATABASE_URL` (the Supabase string)
+   and `GEMINI_API_KEY`. Optional: `GEMINI_MODEL`.
+
+The free instance sleeps after about 15 minutes idle, so open the URL a few minutes before a demo.
+The app has no login: everyone who opens the URL shares one wallet.
+
 ## Test
 
 ```bash
