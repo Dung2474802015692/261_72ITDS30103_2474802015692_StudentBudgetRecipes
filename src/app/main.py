@@ -5,10 +5,7 @@ from urllib.parse import quote
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
-<<<<<<< HEAD
 from fastapi.staticfiles import StaticFiles 
-=======
->>>>>>> b1764f9bbf196741180d85f0fbf7744e63f8b478
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -29,11 +26,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Student Budget Recipes", lifespan=lifespan)
-<<<<<<< HEAD
 app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
 
-=======
->>>>>>> b1764f9bbf196741180d85f0fbf7744e63f8b478
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
 templates.env.filters["vnd"] = lambda n: f"{round(n):,}".replace(",", ".") + "đ"
 
