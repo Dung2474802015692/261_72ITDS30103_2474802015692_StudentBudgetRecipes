@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Budget Recipes</title>
+  <style>
+    /* Flat design, fresh green + food amber. System fonts so it works fully offline. */
+    :root {
+      --bg: #ecfdf5; --card: #ffffff; --fg: #0f172a; --muted: #475569; --border: #cfe9df;
+      --primary: #047857; --on-primary: #ffffff; --accent: #b45309; --danger: #b91c1c;
+      --ok: #047857; --warn-bg: #fef3c7; --warn-border: #d97706; --err-bg: #fee2e2;
+      --track: #d1e7dd; --r: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b1f18; --card: #12302a; --fg: #ecfdf5; --muted: #a7c4b8; --border: #24493e;
+        --primary: #34d399; --on-primary: #052e22; --accent: #fbbf24; --danger: #fca5a5;
+        --ok: #34d399; --warn-bg: #3b2f0b; --warn-border: #fbbf24; --err-bg: #4a1d1d;
+        --track: #24493e;
+      }
+    }
+    * { box-sizing: border-box; }
+<<<<<<< HEAD
+    body {
+    margin: 0;
+    background: linear-gradient(rgba(15, 23, 42, 0.3), rgba(15, 23, 42, 0.3)), 
+                url('/static/food.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #ffffff;
+    font: 16px/1.6 "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+=======
+    body { margin: 0; background: var(--bg); color: var(--fg);
+      font: 16px/1.6 "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+>>>>>>> b1764f9bbf196741180d85f0fbf7744e63f8b478
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px 56px; }
+    .skip { position: absolute; left: -999px; background: var(--primary); color: var(--on-primary); padding: 8px 12px; }
+    .skip:focus { left: 8px; top: 8px; z-index: 10; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0; }
+    nav a { color: var(--fg); text-decoration: none; font-weight: 700; padding: 10px 16px; border-radius: 999px; min-height: 44px; display: inline-flex; align-items: center; }
+    nav a:hover { background: var(--track); }
+    nav a[aria-current="page"] { background: var(--primary); color: var(--on-primary); }
+    h1 { font-size: 1.75rem; margin: 8px 0 12px; line-height: 1.25; }
+    h2 { font-size: 1.25rem; margin: 0 0 8px; }
+    p { margin: 8px 0; }
+    a { color: var(--primary); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin: 16px 0; }
+    .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 16px; }
+    .stat small { display: block; }
+    .stat strong { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+    .balance { display: flex; align-items: center; gap: 16px; }
+    .balance svg { width: 40px; height: 40px; flex: none; color: var(--primary); }
+    .balance strong { font-size: 2rem; color: var(--ok); font-variant-numeric: tabular-nums; }
+    label { display: block; margin: 10px 0; font-weight: 600; }
+    input, select, textarea { display: block; width: 100%; max-width: 420px; margin-top: 4px; font: inherit; color: inherit;
+      background: var(--card); border: 1px solid var(--muted); border-radius: 8px; padding: 10px 12px; min-height: 44px; }
+    td input { max-width: 140px; margin: 0; }
+    textarea { max-width: 560px; }
+    button, .btn { font: inherit; font-weight: 700; background: var(--primary); color: var(--on-primary); border: 2px solid var(--primary);
+      border-radius: 8px; padding: 8px 16px; min-height: 44px; cursor: pointer; transition: opacity .15s; white-space: nowrap; }
+    button:hover { opacity: .88; }
+    button.secondary { background: transparent; color: var(--primary); }
+    button.danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; background: var(--card); border-radius: var(--r); }
+    th, td { border-bottom: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: middle; }
+    th { color: var(--muted); font-size: .875rem; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .error, .warn { border-radius: 8px; padding: 12px 16px; margin: 12px 0; border: 1px solid; }
+    .error { background: var(--err-bg); border-color: var(--danger); }
+    .warn { background: var(--warn-bg); border-color: var(--warn-border); }
+    .ok { color: var(--ok); font-weight: 700; }
+    .bad { color: var(--danger); font-weight: 700; }
+    .meter { height: 10px; background: var(--track); border-radius: 999px; overflow: hidden; margin: 8px 0; }
+    .meter span { display: block; height: 100%; background: var(--primary); }
+    .meter.over span { background: var(--danger); }
+    form.inline { display: inline; }
+    small, .muted { color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Bỏ qua điều hướng</a>
+  <div class="wrap">
+    <nav aria-label="Chính">
+      {% for href, label in (("/", "Ví & thực đơn"), ("/recipes", "Công thức"), ("/prices", "Bảng giá")) %}
+      <a href="{{ href }}" {% if request.url.path == href or (href != "/" and request.url.path.startswith(href)) %}aria-current="page"{% endif %}>{{ label }}</a>
+      {% endfor %}
+    </nav>
+    <main id="main">
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      {% block body %}{% endblock %}
+    </main>
+  </div>
+  <script>
+    // Show 1.234.567 while typing; send plain digits to the server.
+    document.querySelectorAll("input[data-money]").forEach(function (el) {
+      var digits = function () { return el.value.replace(/\D/g, ""); };
+      var show = function () { el.value = digits().replace(/\B(?=(\d{3})+(?!\d))/g, "."); };
+      el.addEventListener("input", show);
+      show();
+      el.form.addEventListener("submit", function () { el.value = digits(); });
+    });
+  </script>
+</body>
+<<<<<<< HEAD
+</html>
+=======
+</html>
+>>>>>>> b1764f9bbf196741180d85f0fbf7744e63f8b478
