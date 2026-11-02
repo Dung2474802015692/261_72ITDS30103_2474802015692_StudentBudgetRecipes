@@ -7,10 +7,9 @@
   <div class="stat"><small>Ngân sách</small><strong>{{ plan.budget|vnd }}</strong></div>
   <div class="stat"><small>Chi phí</small><strong class="{{ 'bad' if over else 'ok' }}">{{ cost|vnd }}</strong></div>
   <div class="stat"><small>Ví còn</small><strong>{{ wallet.balance|vnd }}</strong></div>
+<div class="stat"><small>Ví còn</small><strong>{{ wallet.balance|vnd }}</strong></div>
 </div>
-<div class="meter {{ 'over' if over }}" role="img" aria-label="Đã dùng {{ (cost * 100 // plan.budget) }}% ngân sách"><span style="width: {{ [cost * 100 // plan.budget, 100]|min }}%"></span></div>
-{% if plan.exclusions %}<p class="muted">Đang tránh: {{ plan.exclusions }}</p>{% endif %}
-
+<div class="meter {% if over %}over{% endif %}" role="img" aria-label="Thanh tien trinh"><span style="width: 100%;"></span></div>
 {% if over %}
 <section class="warn">
   <strong>Chi phí vượt ngân sách {{ (cost - plan.budget)|vnd }}</strong> (giá có thể đã tăng). Chọn cách xử lý:
@@ -56,10 +55,12 @@
 <section class="card">
   <h2>Danh sách đi chợ</h2>
   <p>
-    {% if weeks > 1 %}
-      {% for w in range(1, weeks + 1) %}<a href="/shopping/{{ plan.id }}?week={{ w }}">Tuần {{ w }}</a> · {% endfor %}
-    {% endif %}
-    <a href="/shopping/{{ plan.id }}">{{ "Cả kỳ" if weeks > 1 else "Xem danh sách" }}</a>
+  {% if weeks > 1 %}
+    {% for w in range(1, weeks + 1) %}
+      <a href="/shopping/{{ plan.id }}?week={{ w }}">Tuần {{ w }}</a> · 
+    {% endfor %}
+  {% endif %}
+  <a href="/shopping/{{ plan.id }}">{{ "Cả kỳ" if weeks > 1 else "Xem danh sách" }}</a>
   </p>
 </section>
 
