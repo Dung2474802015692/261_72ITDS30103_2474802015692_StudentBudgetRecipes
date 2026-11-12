@@ -194,7 +194,7 @@ def shopping_list(db: Session, plan: Plan, week: int | None = None):
 def parse_ingredients(db: Session, text: str) -> list[tuple[PriceItem, float]]:
     """One ingredient per line as `name; quantity`, name must exist in the price list."""
     parsed = []
-    for line in filter(None, (l.strip() for l in text.splitlines())):
+    for line in filter(None, (raw_line.strip() for raw_line in text.splitlines())):
         name, _, raw = line.partition(";")
         item = db.scalar(select(PriceItem).where(func.lower(PriceItem.name) == name.strip().lower()))
         if item is None:
