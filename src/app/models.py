@@ -41,11 +41,23 @@ class RecipeIngredient(Base):
     item: Mapped[PriceItem] = relationship(lazy="selectin")
 
 
+class User(Base):
+    """Someone who signs in. Each user has one wallet and their own plans."""
+
+    __tablename__ = "app_user"  # "user" is a reserved word in PostgreSQL
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(unique=True)
+    password_hash: Mapped[str]
+
+
 class Wallet(Base):
     __tablename__ = "wallet"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     balance: Mapped[int] = mapped_column(default=0)
+    # NULL only in rows created before accounts existed; those belong to nobody and stay hidden.
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id"), unique=True, index=True, nullable=True)
 
 
 class Plan(Base):
@@ -56,6 +68,8 @@ class Plan(Base):
     start_date: Mapped[date]
     budget: Mapped[int]
     exclusions: Mapped[str] = mapped_column(default="")  # comma-separated words
+    # NULL only in plans created before accounts existed; those belong to nobody and stay hidden.
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("app_user.id"), index=True, nullable=True)
 
 
 class MenuEntry(Base):

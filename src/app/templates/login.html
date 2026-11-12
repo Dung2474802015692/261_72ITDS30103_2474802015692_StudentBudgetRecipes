@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Đăng nhập</h1>
+
+<section class="card">
+  <form method="post" action="/login">
+    <label>Tên đăng nhập
+      <input name="username" autocomplete="username" required minlength="3" maxlength="30">
+    </label>
+    <label>Mật khẩu
+      <input type="password" name="password" autocomplete="current-password" required>
+    </label>
+    <p><button>Đăng nhập</button></p>
+  </form>
+  <p class="muted">Chưa có tài khoản? <a href="/register">Đăng ký</a></p>
+</section>
+{% endblock %}

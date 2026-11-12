@@ -7,6 +7,7 @@ that fits the budget, avoids foods the user cannot eat, and turns it into a shop
 
 ## Features
 
+- **Accounts** – sign up and log in. Each user has their own wallet and plans; the price list and recipes are shared.
 - **Wallet** – top up any time; creating a menu takes its budget from the wallet.
 - **Menu** – day, week or month, two meals a day, never over budget, skips excluded foods (allergies).
 - **Price list** – ~100 sample supermarket items, editable. Plans are re-priced from it live.
@@ -64,11 +65,13 @@ Render's disk is wiped on every restart, so the public site must use a hosted Po
    | Start command | `uvicorn app.main:app --app-dir src --host 0.0.0.0 --port $PORT` |
    | Instance type | Free |
 
-3. **Environment variables** (Render dashboard, never in the repo): `DATABASE_URL` (the Supabase string)
+3. **Environment variables** (Render dashboard, never in the repo): `DATABASE_URL` (the Supabase string),
+   `SESSION_SECRET` (a long random string that signs the login cookie), `COOKIE_SECURE=1` (the site is HTTPS),
    and `GEMINI_API_KEY`. Optional: `GEMINI_MODEL`.
 
 The free instance sleeps after about 15 minutes idle, so open the URL a few minutes before a demo.
-The app has no login: everyone who opens the URL shares one wallet.
+Passwords are stored only as scrypt hashes. Without `SESSION_SECRET` everyone is logged out after each restart.
+Wallets and plans made before accounts existed belong to nobody and are not shown; new accounts start empty.
 
 ## Test
 
@@ -80,7 +83,8 @@ pytest
 
 | Path | Contents |
 |------|----------|
-| `src/app/services.py` | Business rules (wallet, menu, budget fixes, shopping list) |
+| `src/app/services.py` | Business rules (accounts, wallet, menu, budget fixes, shopping list) |
+| `src/app/security.py` | Password hashing (scrypt, standard library) |
 | `src/app/ai.py` | Gemini call and its failure handling |
 | `src/app/main.py` | Web routes |
 | `src/app/seed.py` | Sample prices and recipes |
@@ -88,4 +92,4 @@ pytest
 
 ## Status
 
-Offline version working. Docker, Compose, CI/CD and cloud deployment come next.
+Docker, Compose and CI are in place on `main`. User accounts are in a separate pull request, waiting for review.

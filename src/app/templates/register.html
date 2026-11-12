@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Đăng ký tài khoản</h1>
+
+<section class="card">
+  <form method="post" action="/register">
+    <label>Tên đăng nhập
+      <input name="username" autocomplete="username" required minlength="3" maxlength="30"
+             aria-describedby="user-help">
+    </label>
+    <small id="user-help">3 đến 30 ký tự: chữ không dấu, số hoặc dấu gạch dưới.</small>
+    <label>Mật khẩu
+      <input type="password" name="password" autocomplete="new-password" required minlength="8"
+             aria-describedby="pass-help">
+    </label>
+    <small id="pass-help">Ít nhất 8 ký tự.</small>
+    <label>Nhập lại mật khẩu
+      <input type="password" name="confirm" autocomplete="new-password" required minlength="8">
+    </label>
+    <p><button>Tạo tài khoản</button></p>
+  </form>
+  <p class="muted">Đã có tài khoản? <a href="/login">Đăng nhập</a></p>
+</section>
+{% endblock %}

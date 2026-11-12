@@ -38,6 +38,9 @@
     nav a { color: var(--fg); text-decoration: none; font-weight: 700; padding: 10px 16px; border-radius: 999px; min-height: 44px; display: inline-flex; align-items: center; }
     nav a:hover { background: var(--track); }
     nav a[aria-current="page"] { background: var(--primary); color: var(--on-primary); }
+    nav .account { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    nav .who { font-weight: 400; color: var(--muted); }
+    nav form.inline button { min-height: 44px; }
     h1 { font-size: 1.75rem; margin: 8px 0 12px; line-height: 1.25; }
     h2 { font-size: 1.25rem; margin: 0 0 8px; }
     p { margin: 8px 0; }
@@ -83,9 +86,20 @@
   <a class="skip" href="#main">Bỏ qua điều hướng</a>
   <div class="wrap">
     <nav aria-label="Chính">
+      {% if request.session.get("user_id") %}
       {% for href, label in (("/", "Ví & thực đơn"), ("/recipes", "Công thức"), ("/prices", "Bảng giá")) %}
       <a href="{{ href }}" {% if request.url.path == href or (href != "/" and request.url.path.startswith(href)) %}aria-current="page"{% endif %}>{{ label }}</a>
       {% endfor %}
+      <div class="account">
+        <span class="who">Xin chào, <strong>{{ request.session.get("username") }}</strong></span>
+        <form class="inline" method="post" action="/logout"><button class="secondary">Đăng xuất</button></form>
+      </div>
+      {% else %}
+      <div class="account">
+        <a href="/login" {% if request.url.path == "/login" %}aria-current="page"{% endif %}>Đăng nhập</a>
+        <a href="/register" {% if request.url.path == "/register" %}aria-current="page"{% endif %}>Đăng ký</a>
+      </div>
+      {% endif %}
     </nav>
     <main id="main">
       {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
