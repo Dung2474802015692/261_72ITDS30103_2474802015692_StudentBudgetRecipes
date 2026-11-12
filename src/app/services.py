@@ -1,34 +1,74 @@
 """Business rules. No web code here, so every rule can be unit-tested."""
 
+import re
 from datetime import date, timedelta
 from math import ceil
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
-from .models import MenuEntry, Plan, PriceItem, Recipe, RecipeIngredient, Wallet
+from .models import MenuEntry, Plan, PriceItem, Recipe, RecipeIngredient, User, Wallet
+from .security import hash_password, verify_password
 
 PERIOD_DAYS = {"day": 1, "week": 7, "month": 30}
 SLOTS = ("lunch", "dinner")
 MIN_SERVINGS, STEP = 0.5, 0.25
 RECENT = 3  # a recipe is not repeated within this many meals if avoidable
+USERNAME = re.compile(r"[A-Za-z0-9_]{3,30}")
+MIN_PASSWORD, MAX_PASSWORD = 8, 128
 
 
-# ---------- wallet ----------
+# ---------- accounts ----------
 
-def get_wallet(db: Session) -> Wallet:
-    wallet = db.get(Wallet, 1)
+# Checked when the username does not exist, so a failed login takes as long as a real one.
+_NO_USER_HASH = hash_password("no-such-user")
+
+
+def find_user(db: Session, username: str) -> User | None:
+    return db.scalar(select(User).where(func.lower(User.username) == username.strip().lower()))
+
+
+def register_user(db: Session, username: str, password: str, confirm: str) -> User:
+    username = username.strip()
+    if not USERNAME.fullmatch(username):
+        raise ValueError("Tên đăng nhập chỉ gồm chữ không dấu, số và dấu gạch dưới, từ 3 đến 30 ký tự")
+    if len(password) < MIN_PASSWORD:
+        raise ValueError("Mật khẩu phải có ít nhất 8 ký tự")
+    if len(password) > MAX_PASSWORD:
+        raise ValueError("Mật khẩu quá dài, tối đa 128 ký tự")
+    if password != confirm:
+        raise ValueError("Mật khẩu nhập lại không khớp")
+    if find_user(db, username) is not None:
+        raise ValueError("Tên đăng nhập này đã có người dùng")
+    user = User(username=username, password_hash=hash_password(password))
+    db.add(user)
+    db.flush()
+    return user
+
+
+def authenticate_user(db: Session, username: str, password: str) -> User:
+    user = find_user(db, username)
+    stored = user.password_hash if user is not None else _NO_USER_HASH
+    if verify_password(password, stored) and user is not None:
+        return user
+    raise ValueError("Sai tên đăng nhập hoặc mật khẩu")
+
+
+# ---------- wallet (one per user) ----------
+
+def get_wallet(db: Session, user: User) -> Wallet:
+    wallet = db.scalar(select(Wallet).where(Wallet.user_id == user.id))
     if wallet is None:
-        wallet = Wallet(id=1, balance=0)
+        wallet = Wallet(user_id=user.id, balance=0)
         db.add(wallet)
         db.flush()
     return wallet
 
 
-def topup(db: Session, amount: int) -> Wallet:
+def topup(db: Session, user: User, amount: int) -> Wallet:
     if amount <= 0:
         raise ValueError("Số tiền nạp phải lớn hơn 0")
-    wallet = get_wallet(db)
+    wallet = get_wallet(db, user)
     wallet.balance += amount
     return wallet
 
@@ -110,25 +150,25 @@ def generate_menu(db: Session, plan: Plan, from_day: date) -> None:
     db.flush()
 
 
-def create_plan(db: Session, period: str, budget: int, start: date, exclusions: str) -> Plan:
+def create_plan(db: Session, user: User, period: str, budget: int, start: date, exclusions: str) -> Plan:
     if period not in PERIOD_DAYS:
         raise ValueError("Chu kỳ phải là ngày, tuần hoặc tháng")
     if budget <= 0:
         raise ValueError("Ngân sách phải lớn hơn 0")
-    wallet = get_wallet(db)
+    wallet = get_wallet(db, user)
     if budget > wallet.balance:
         raise ValueError("Số dư ví không đủ, hãy nạp thêm tiền")
     wallet.balance -= budget
-    plan = Plan(period=period, start_date=start, budget=budget, exclusions=exclusions.strip())
+    plan = Plan(user_id=user.id, period=period, start_date=start, budget=budget, exclusions=exclusions.strip())
     db.add(plan)
     db.flush()
     generate_menu(db, plan, start)
     return plan
 
 
-def upgrade_plan(db: Session, plan: Plan, amount: int, today: date) -> None:
-    """Move `amount` from the wallet into the plan and rebuild the days still to come."""
-    wallet = get_wallet(db)
+def upgrade_plan(db: Session, user: User, plan: Plan, amount: int, today: date) -> None:
+    """Move `amount` from the user's wallet into the plan and rebuild the days still to come."""
+    wallet = get_wallet(db, user)
     if amount <= 0 or amount > wallet.balance:
         raise ValueError("Số tiền nâng cấp không hợp lệ hoặc vượt số dư ví")
     wallet.balance -= amount

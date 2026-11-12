@@ -1,35 +1,51 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from app import ai
 from app.main import app
 
-client = TestClient(app)
+PASSWORD = "password123"
 
 
-def test_pages_render(db):
-    for url in ("/", "/prices", "/recipes", "/health"):
-        assert client.get(url).status_code == 200
+@pytest.fixture
+def client(db):
+    return TestClient(app)
 
 
-def test_full_flow_wallet_plan_shopping(db):
-    client.post("/wallet/topup", data={"amount": 400000})
-    resp = client.post("/plans", data={"period": "week", "budget": 300000, "start": "2026-11-02"}, follow_redirects=False)
+@pytest.fixture
+def signed_in(client):
+    client.post("/register", data={"username": "tester", "password": PASSWORD, "confirm": PASSWORD})
+    return client
+
+
+def test_health_is_public(client):
+    assert client.get("/health").status_code == 200
+
+
+def test_pages_render_for_a_signed_in_user(signed_in):
+    for url in ("/", "/prices", "/recipes"):
+        assert signed_in.get(url).status_code == 200
+
+
+def test_full_flow_wallet_plan_shopping(signed_in):
+    signed_in.post("/wallet/topup", data={"amount": 400000})
+    resp = signed_in.post("/plans", data={"period": "week", "budget": 300000, "start": "2026-11-02"}, follow_redirects=False)
     assert resp.status_code == 303
     plan_url = resp.headers["location"]
-    assert "Trưa" in client.get(plan_url).text
-    shopping = client.get(plan_url.replace("/plans/", "/shopping/"))
+    assert "Trưa" in signed_in.get(plan_url).text
+    shopping = signed_in.get(plan_url.replace("/plans/", "/shopping/"))
     assert "Tổng" in shopping.text
 
 
-def test_plan_without_enough_money_shows_message(db):
-    resp = client.post("/plans", data={"period": "week", "budget": 300000, "start": "2026-11-02"}, follow_redirects=True)
+def test_plan_without_enough_money_shows_message(signed_in):
+    resp = signed_in.post("/plans", data={"period": "week", "budget": 300000, "start": "2026-11-02"}, follow_redirects=True)
     assert "Số dư ví không đủ" in resp.text
 
 
-def test_substitute_without_key_keeps_list_and_shows_notice(db):
-    client.post("/wallet/topup", data={"amount": 400000})
-    plan_url = client.post("/plans", data={"period": "week", "budget": 300000, "start": "2026-11-02"}).url.path
-    resp = client.post(plan_url.replace("/plans/", "/shopping/") + "/substitute", data={"item_id": 1})
+def test_substitute_without_key_keeps_list_and_shows_notice(signed_in):
+    signed_in.post("/wallet/topup", data={"amount": 400000})
+    plan_url = signed_in.post("/plans", data={"period": "week", "budget": 300000, "start": "2026-11-02"}).url.path
+    resp = signed_in.post(plan_url.replace("/plans/", "/shopping/") + "/substitute", data={"item_id": 1})
     assert resp.status_code == 200
     assert "tạm thời không khả dụng" in resp.text and "Tổng" in resp.text
 
